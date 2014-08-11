@@ -22,7 +22,7 @@ class JsonResumeCLI < Thor
 
   desc "sample", "Generates a sample json file in cwd"
   def sample()
-    cwd = Dir.pwd 
+    cwd = Dir.pwd
     json_file_paths = Dir["#{@@orig_locn}/../examples/*.json"]
     json_file_names = json_file_paths.map{|x| File.basename(x)}
     FileUtils.cp json_file_paths, Dir.pwd
@@ -50,17 +50,13 @@ class JsonResumeCLI < Thor
       tmp_dir = ".tmp_resume"
       convert_to_html(json_input, template, dest, tmp_dir)
       PDFKit.configure do |config|
-        config.default_options = {
-          :footer_right => "Page [page] of [toPage]    .\n",
-          :footer_font_size => 10,
-          :footer_font_name => "Georgia"   
-        }
+        config.default_options = {}
       end
       html_file = File.new("#{dest}/#{tmp_dir}/core-page.html")
 
       pdf_options = {
         :margin_top => 2.0,
-        :margin_left=> 0.0, 
+        :margin_left=> 0.0,
         :margin_right => 0.0,
         :margin_bottom => 4.0,
         :page_size => 'Letter'
@@ -100,14 +96,14 @@ class JsonResumeCLI < Thor
     def use_write_latex(dest, filename)
        reply = ask "Create PDF online using writeLatex ([y]n)?"
        if reply == "" || reply == "y"
-          return convert_using_writeLatex(dest, filename)  
+          return convert_using_writeLatex(dest, filename)
        end
        msg = "Latex file created at #{dest}/#{filename}"
     end
 
     def convert_using_writeLatex(dest, filename)
       tex_file = File.read("#{dest}/#{filename}")
-      RestClient.post(WL_URL, :snip => tex_file, :splash => "none") do |response, req, res, &bb| 
+      RestClient.post(WL_URL, :snip => tex_file, :splash => "none") do |response, req, res, &bb|
         FileUtils.rm "#{dest}/#{filename}"
         msg = "\nPDF is ready at #{response.headers[:location]}"
       end
